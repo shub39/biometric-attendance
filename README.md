@@ -6,5 +6,5 @@ Current goal is to make a system with raspberry pi and fingerprint scanners to c
 
 # Current Devices Used
 1. Raspberry Pi 4 Model B
-2. Scanner used : R307 fingerprint scanner
+2. R307 fingerprint scanner
 3. tty to USB converter
