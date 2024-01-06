@@ -21,7 +21,6 @@ def clear_database():
     print('All Data Cleared\n')
 
 def enroll_fingerprint():
-    name=str(input("Enter Student Name: "))
     try:
         if (f.verifyPassword() == False):
             print('Contact Admin\n')
@@ -47,15 +46,18 @@ def enroll_fingerprint():
                 print('*Remove Finger*' + '\n')
                 print('*Place Finger Again*' + '\n')
                 while (f.readImage() == False):
+                    print('0')
                     pass
                     f.convertImage(0X02)
                     if f.compareCharacteristics == 0:
+                        print('1')
                         pass
-                f.createTemplate()
-                positionNumber = f.storeTemplate()
-                f.loadTemplate(positionNumber, 0X01)
-                characteristics = str(f.downloadCharacteristics(0x01)).encode('utf-8')
-                print('Fingerprint Registered In Position #' + str(positionNumber+1) + '\n')
+                    else:    
+                        f.createTemplate()
+                        positionNumber = f.storeTemplate()
+                        f.loadTemplate(positionNumber, 0X01)
+                        characteristics = str(f.downloadCharacteristics(0x01)).encode('utf-8')
+                        print('Fingerprint Registered In Position #' + str(positionNumber+1) + '\n')
     except Exception as e:
         print('Operation failed- Exception message: ' + str(e) + '\n')
         return None
