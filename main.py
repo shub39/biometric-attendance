@@ -1,39 +1,43 @@
 import os
 from pyfingerprint.pyfingerprint import PyFingerprint
 
-f = PyFingerprint('/dev/ttyUSB0', 57600, 0xFFFFFFFF, 0x00000000)
+#################################################################################################################
+#################################################################################################################
+
+try:
+    f = PyFingerprint('/dev/ttyUSB0', 57600, 0xFFFFFFFF, 0x00000000)
+except Exception as e:
+    print('The Fingerprint sensor cant be initialised!\n')
+    print(str(e))
+    
+#################################################################################################################
+#################################################################################################################
 
 def clear_database():
     f.clearDatabase()
     data=open('students.txt','w')
     data.close()
-    print('')
+    print('All Data Cleared\n')
 
 def enroll_fingerprint():
     data=open('students.txt','a')
     name=str(input("Enter Student Name: "))
-    #college_roll=str(input("Enter Student Roll no: "))
     try:
         if (f.verifyPassword() == False):
-            print('Contact Admin')
-            print('')
-            raise ValueError('The given fingerprint sensor password wrong')
+            print('Contact Admin\n')
+            raise ValueError('The given fingerprint sensor password wrong\n')
 
     except Exception as e:
-            print('Contact Admin')
-            print('')
+            print('Contact Admin\n')
             print('The fingerprint sensor could not be initialized')
-            print('Exception message: ' + str(e))
-            print('') 
+            print('Exception message: ' + str(e) + '\n')
             data.close()
             return None
 
-    print('Currently used templates: ' + str(f.getTemplateCount()))
-    print('')
+    print('Currently used templates: ' + str(f.getTemplateCount()) + '\n')
 
     try:
-            print('*Waiting For Finger*')
-            print('')
+            print('*Waiting For Finger*' + '\n')
 
             # Wait for finger to be read
 
@@ -46,15 +50,12 @@ def enroll_fingerprint():
             positionNumber = result[0]
 
             if (positionNumber >= 0):
-                print('Fingerprint Already Exists at #' + str(positionNumber+1))
-                print('')
+                print('Fingerprint Already Exists at #' + str(positionNumber+1) + '\n')
                 return None
             else:
-                print('*Remove Finger*')
-                print('')
-                print('*Place Finger Again*')
-                print('')
-
+                print('*Remove Finger*' + '\n')
+                print('*Place Finger Again*' + '\n')
+                
                 # waiting for second read
                 while (f.readImage() == False):
                     pass
@@ -62,8 +63,7 @@ def enroll_fingerprint():
                 f.convertImage(0X02)
 
                 if (f.compareCharacteristics() == 0):
-                    print('Fingers Do Not Match, Try again')
-                    print('')
+                    print('Fingers Do Not Match, Try again' + '\n')
                     return None
 
                 f.createTemplate()
@@ -74,35 +74,37 @@ def enroll_fingerprint():
 
                 characteristics = str(f.downloadCharacteristics(0x01)).encode('utf-8')
                 
-                print('Fingerprint Registered In Position #' + str(positionNumber+1))
-                print('')
+                print('Fingerprint Registered In Position #' + str(positionNumber+1) + '\n')
                 data.write(str(positionNumber) + name + ' '+ '\n') 
                 data.flush()
                 data.close()
     
     except Exception as e:
         data.close()
-        print('Operation failed- Exception message: ' + str(e))
+        print('Operation failed- Exception message: ' + str(e) + '\n')
         return None
         
 def attendance():
+    print('Attendance Mode\n')
     t1=1
-    while t1!=0:
-        print('1. Take reading')
-        print('0. Quit')
-        print('Place Your finger...')
-        if t1==1:
-            while (f.readImage() == False):
-                pass
-            f.convertImage(0X01)  
-            result = f.searchTemplate()
-            if result[0]==-1:
-                print('No Match Found')
-                print('')
-                return None
+    try:
+        while t1!=0:
+            print('1. Take reading')
+            t1=int(input('Enter your Choice: '))
+            if t1==1:
+                print('Place Your finger...')
+                while (f.readImage() == False):
+                    pass
+                f.convertImage()  
+                result = f.searchTemplate()
+                if result[0]==-1:
+                    print('No Match Found' + '\n')
+                else:
+                    print('Found template at position #' + str(result[0]+1) + '\n')
             else:
-                print('Found template at position #' + str(result[0]+1))
-                print('')    
+                return None
+    except Exception as e:
+        print('Operation Failed- Exception message: '+str(e) + '\n')       
 
 ###################################################################################################################################################
 ###################################################################################################################################################
@@ -110,10 +112,12 @@ def attendance():
 if __name__ == '__main__':
     t=1
     while t!=0:
+        print('Fingerprint Attendance system with raspberry Pi\n')
         print("1. Enroll a new fingerprint")
         print('2. Attendance')
         print("3. Clear Database")
-        t=str(input('Select Funtion :'))
+        print('')
+        t=str(input('Select Funtion : '))
         if t=='1':
             enroll_fingerprint()
         elif t=='2':
