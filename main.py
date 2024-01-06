@@ -43,44 +43,36 @@ def enroll_fingerprint():
                 print('Fingerprint Already Exists at #' + str(positionNumber+1) + '\n')
                 return None
             else:
-                print('*Remove Finger*' + '\n')
-                print('*Place Finger Again*' + '\n')
-                while (f.readImage() == False):
-                    print('0')
+                print('**Remove your finger**\n')
+                while (f.readImage() == True):
                     pass
-                    f.convertImage(0X02)
-                    if f.compareCharacteristics == 0:
-                        print('1')
-                        pass
-                    else:    
-                        f.createTemplate()
-                        positionNumber = f.storeTemplate()
-                        f.loadTemplate(positionNumber, 0X01)
-                        characteristics = str(f.downloadCharacteristics(0x01)).encode('utf-8')
-                        print('Fingerprint Registered In Position #' + str(positionNumber+1) + '\n')
+                print('**Place your finger again\n**')    
+                while (f.readImage() == False):
+                    pass
+                f.convertImage(0X02)    
+                if f.compareCharacteristics()==0:
+                    print('Fingerprints dont match...Trying again\n')
+                    enroll_fingerprint()
+                    return None
+                f.convertImage(0X02)
+                f.createTemplate()
+                positionNumber = f.storeTemplate()
+                print('Fingerprint Registered In Position #' + str(positionNumber+1) + '\n')
     except Exception as e:
         print('Operation failed- Exception message: ' + str(e) + '\n')
         return None
         
 def attendance():
-    print('Attendance Mode\n')
-    t1=1
     try:
-        while t1!=0:
-            print('1. Take reading')
-            t1=int(input('Enter your Choice: '))
-            if t1==1:
-                print('Place Your finger...')
-                while (f.readImage() == False):
-                    pass
-                f.convertImage()  
-                result = f.searchTemplate()
-                if result[0]==-1:
-                    print('No Match Found' + '\n')
-                else:
-                    print('Found template at position #' + str(result[0]+1) + '\n')
-            else:
-                return None
+        print('Place Your finger...\n')
+        while (f.readImage() == False):
+            pass
+        f.convertImage()  
+        result = f.searchTemplate()
+        if result[0]==-1:
+            print('No Match Found' + '\n')
+        else:
+            print('Found template at position #' + str(result[0]+1) + '\n')
     except Exception as e:
         print('Operation Failed- Exception message: '+str(e) + '\n')       
 
