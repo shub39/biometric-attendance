@@ -19,14 +19,11 @@ def show_data():
     
 def clear_database():
     f.clearDatabase()
-    file1=open('studentdata.txt','w')
+    file1=open('studentdata.csv','w')
     file1.close()
     print('All Data Cleared\n')
 
 def enroll_fingerprint():
-    file1=open('studentdata.txt','a')
-    name=str(input('Enter student Name: '))
-    roll=str(input('Enter Roll No: '))
     try:
         if (f.verifyPassword() == False):
             print('Contact Admin\n')
@@ -64,7 +61,11 @@ def enroll_fingerprint():
             f.createTemplate()
             positionNumber = f.storeTemplate()
             print('Fingerprint Registered In Position #' + str(positionNumber+1) + '\n')
-            file1.write(str(positionNumber+1)+' '+name+' '+roll+'\n')
+            file1=open('studentdata.csv','a')
+            writer=csv.writer(file1)
+            roll=str(input('Enter Roll No: '))
+            name=str(input('Enter student Name: '))
+            writer.writerow([str(positionNumber+1),roll,name])
             file1.close()
     except Exception as e:
         print('Operation failed- Exception message: ' + str(e) + '\n')
@@ -82,10 +83,11 @@ def attendance():
             attendance()
         else:
             print('Found template at position #' + str(result[0]+1) + '\n')
-            file1=open('studentdata.txt','r')
-            list1=file1.readlines()
-            print('Student Details')
-            print(list1[result[0]])
+            file1=open('studentdata.csv','r')
+            csvreader=csv.reader(file1)
+            for row in csvreader:
+                if row[0]==str(result[0]+1):
+                    print(row)
     except Exception as e:
         print('Operation Failed- Exception message: '+str(e) + '\n')       
 
