@@ -1,10 +1,9 @@
 import os
+import csv
 from pyfingerprint.pyfingerprint import PyFingerprint
 
 #################################################################################################################
 #################################################################################################################
-
-#try to add files
 
 try:
     f = PyFingerprint('/dev/ttyUSB0', 57600, 0xFFFFFFFF, 0x00000000)
@@ -20,9 +19,14 @@ def show_data():
     
 def clear_database():
     f.clearDatabase()
+    file1=open('studentdata.txt','w')
+    file1.close()
     print('All Data Cleared\n')
 
 def enroll_fingerprint():
+    file1=open('studentdata.txt','a')
+    name=str(input('Enter student Name: '))
+    roll=str(input('Enter Roll No: '))
     try:
         if (f.verifyPassword() == False):
             print('Contact Admin\n')
@@ -35,31 +39,33 @@ def enroll_fingerprint():
             return None
     print('Currently used templates: ' + str(f.getTemplateCount()) + '\n')
     try:
-            print('*Waiting For Finger*' + '\n')
+        print('*Waiting For Finger*' + '\n')
+        while (f.readImage() == False):
+            pass
+        f.convertImage(0x01)
+        result = f.searchTemplate()
+        positionNumber = result[0]
+        if (positionNumber >= 0):
+            print('Fingerprint Already Exists at #' + str(positionNumber+1) + '\n')
+            return None
+        else:
+            print('**Remove your finger**\n')
+            while (f.readImage() == True):
+                pass
+            print('**Place your finger again**\n')    
             while (f.readImage() == False):
                 pass
-            f.convertImage(0x01)
-            result = f.searchTemplate()
-            positionNumber = result[0]
-            if (positionNumber >= 0):
-                print('Fingerprint Already Exists at #' + str(positionNumber+1) + '\n')
+            f.convertImage(0X02)    
+            if f.compareCharacteristics()==0:
+                print('Fingerprints dont match...Trying again\n')
+                enroll_fingerprint()
                 return None
-            else:
-                print('**Remove your finger**\n')
-                while (f.readImage() == True):
-                    pass
-                print('**Place your finger again\n**')    
-                while (f.readImage() == False):
-                    pass
-                f.convertImage(0X02)    
-                if f.compareCharacteristics()==0:
-                    print('Fingerprints dont match...Trying again\n')
-                    enroll_fingerprint()
-                    return None
-                f.convertImage(0X02)
-                f.createTemplate()
-                positionNumber = f.storeTemplate()
-                print('Fingerprint Registered In Position #' + str(positionNumber+1) + '\n')
+            f.convertImage(0X02)
+            f.createTemplate()
+            positionNumber = f.storeTemplate()
+            print('Fingerprint Registered In Position #' + str(positionNumber+1) + '\n')
+            file1.write(str(positionNumber+1)+' '+name+' '+roll+'\n')
+            file1.close()
     except Exception as e:
         print('Operation failed- Exception message: ' + str(e) + '\n')
         return None
@@ -72,9 +78,14 @@ def attendance():
         f.convertImage()  
         result = f.searchTemplate()
         if result[0]==-1:
-            print('No Match Found' + '\n')
+            print('No Match Found Try Again...' + '\n')
+            attendance()
         else:
             print('Found template at position #' + str(result[0]+1) + '\n')
+            file1=open('studentdata.txt','r')
+            list1=file1.readlines()
+            print('Student Details')
+            print(list1[result[0]])
     except Exception as e:
         print('Operation Failed- Exception message: '+str(e) + '\n')       
 
