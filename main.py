@@ -19,7 +19,7 @@ def show_data():
     
 def clear_database():
     f.clearDatabase()
-    file1=open('studentdata.csv','w')
+    file1 = open('studentdata.csv','w')
     file1.close()
     print('All Data Cleared\n')
 
@@ -53,7 +53,7 @@ def enroll_fingerprint():
             while (f.readImage() == False):
                 pass
             f.convertImage(0X02)    
-            if f.compareCharacteristics()==0:
+            if f.compareCharacteristics() == 0:
                 print('Fingerprints dont match...Trying again\n')
                 enroll_fingerprint()
                 return None
@@ -83,10 +83,10 @@ def attendance():
             attendance()
         else:
             print('Found template at position #' + str(result[0]+1) + '\n')
-            file1=open('studentdata.csv','r')
-            csvreader=csv.reader(file1)
+            file1 = open('studentdata.csv','r')
+            csvreader = csv.reader(file1)
             for row in csvreader:
-                if row[0]==str(result[0]+1):
+                if row[0] == str(result[0]+1):
                     print(row)
     except Exception as e:
         print('Operation Failed- Exception message: '+str(e) + '\n')       
@@ -95,25 +95,24 @@ def attendance():
 ###################################################################################################################################################
 
 if __name__ == '__main__':
-    t=1
-    while t!=0:
+    t = 1
+    while t != 0:
         print('################################################################################')
         print('Fingerprint Attendance system with raspberry Pi\n')
         print("1. Enroll a new fingerprint")
         print('2. Attendance')
         print("3. Clear Database")
         print('4. Show Data')
-        t=str(input('Select Funtion : '))
+        t = str(input('Select Funtion : '))
         print('################################################################################')
-        if t=='1':
+        if t == '1':
             enroll_fingerprint()
-        elif t=='2':
+        elif t == '2':
             attendance()    
-        elif t=='3':
+        elif t == '3':
             clear_database()  
-        elif t=='4':
+        elif t == '4':
             show_data()
-            
         else:
-            t=0     
+            t = 0     
 
