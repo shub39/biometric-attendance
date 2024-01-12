@@ -1,4 +1,5 @@
 import os
+import time
 import csv
 from pyfingerprint.pyfingerprint import PyFingerprint
 
@@ -8,9 +9,14 @@ from pyfingerprint.pyfingerprint import PyFingerprint
 try:
     f = PyFingerprint('/dev/ttyUSB0', 57600, 0xFFFFFFFF, 0x00000000)
 except Exception as e:
-    print('The Fingerprint sensor can not be initialised!\n')
+    f = PyFingerprint('/dev/ttyUSB1', 57600, 0xFFFFFFFF, 0x00000000)
+except Exception as e:
     print(str(e))
-    exit()
+    
+if not os.path.exists('data/'):
+    os.makedirs('data/')
+
+date = time.strftime("%d-%m-%Y", time.localtime())    
     
 #################################################################################################################
 #################################################################################################################
@@ -62,17 +68,17 @@ def enroll_fingerprint():
             f.createTemplate()
             positionNumber = f.storeTemplate()
             print('Fingerprint Registered In Position #' + str(positionNumber+1) + '\n')
-            file1=open('studentdata.csv','a')
-            writer=csv.writer(file1)
-            roll=str(input('Enter Roll No: '))
-            name=str(input('Enter student Name: '))
-            writer.writerow([str(positionNumber+1),roll,name])
-            file1.close()
+            with open('studentdata.csv', 'a') as file1:
+                writer = csv.writer(file1)
+                roll = str(input('Enter Roll No: '))
+                name = str(input('Enter student Name: '))
+                writer.writerow([str(positionNumber+1),roll,name])
     except Exception as e:
         print('Operation failed- Exception message: ' + str(e) + '\n')
         return None
         
-def attendance():
+def attendance(time):
+    print(time)
     try:
         print('Place Your finger...\n')
         while (f.readImage() == False):
@@ -81,14 +87,28 @@ def attendance():
         result = f.searchTemplate()
         if result[0]==-1:
             print('No Match Found Try Again...' + '\n')
-            attendance()
+            attendance(time)
         else:
+            if not os.path.exists(f'data/{date}.csv'):
+                with open(f'data/{date}.csv', 'w'):
+                    pass
             print('Found template at position #' + str(result[0]+1) + '\n')
-            file1 = open('studentdata.csv','r')
-            csvreader = csv.reader(file1)
-            for row in csvreader:
-                if row[0] == str(result[0]+1):
-                    print(row)
+            with open('studentdata.csv','r') as file1:
+                with open(f'data/{date}.csv', 'r+') as file2:
+                    csvin = csv.reader(file1)
+                    csvout = csv.reader(file2)
+                    csvoutw = csv.writer(file2)
+                    for row in csvin:
+                        if row[0] == str(result[0]+1):
+                            roll = str(row[1])
+                            name = str(row[2])
+                            print('Roll no: ',roll)
+                            print('Name: ',name)
+                            print('Time: ',time)
+                            for row in csvout:
+                                if row[1] != name:
+                                    entry = [roll,name,time]
+                                    csvoutw.writerow(entry) 
     except Exception as e:
         print('Operation Failed- Exception message: '+str(e) + '\n')       
 
@@ -109,7 +129,9 @@ if __name__ == '__main__':
         if t == '1':
             enroll_fingerprint()
         elif t == '2':
-            attendance()    
+            time_tuple = time.localtime()
+            t1 = time.strftime('%H:%M', time_tuple)
+            attendance(t1)    
         elif t == '3':
             clear_database()  
         elif t == '4':
