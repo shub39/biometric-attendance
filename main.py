@@ -21,16 +21,16 @@ date = time.strftime("%d-%m-%Y", time.localtime())
 #################################################################################################################
 #################################################################################################################
 
-def show_data():
+def show_data(): #Shows The number of fingerprints
     print('No of stored Fingerprints: ' + str(f.getTemplateCount()) + '\n')
     
-def clear_database():
+def clear_database(): #Clears the database 
     f.clearDatabase()
     file1 = open('studentdata.csv','w')
     file1.close()
     print('All Data Cleared\n')
 
-def enroll_fingerprint():
+def enroll_fingerprint(): #Enroll a new fingerprint
     try:
         if (f.verifyPassword() == False):
             print('Contact Admin\n')
@@ -41,9 +41,11 @@ def enroll_fingerprint():
             print('Exception message: ' + str(e) + '\n')
             data.close()
             return None
+            
     print('Currently used templates: ' + str(f.getTemplateCount()) + '\n')
     try:
         print('*Waiting For Finger*' + '\n')
+        time.sleep(1)
         while (f.readImage() == False):
             pass
         f.convertImage(0x01)
@@ -51,17 +53,20 @@ def enroll_fingerprint():
         positionNumber = result[0]
         if (positionNumber >= 0):
             print('Fingerprint Already Exists at #' + str(positionNumber+1) + '\n')
+            time.sleep(2)
             return None
         else:
             print('**Remove your finger**\n')
             while (f.readImage() == True):
                 pass
             print('**Place your finger again**\n')    
+            time.sleep(1) 
             while (f.readImage() == False):
                 pass
             f.convertImage(0X02)    
             if f.compareCharacteristics() == 0:
                 print('Fingerprints dont match...Trying again\n')
+                time.sleep(2)
                 enroll_fingerprint()
                 return None
             f.convertImage(0X02)
@@ -77,38 +82,50 @@ def enroll_fingerprint():
         print('Operation failed- Exception message: ' + str(e) + '\n')
         return None
         
-def attendance(time):
-    print(time)
+def attendance(samay): #Take attendance
+    print('Registering finger at: ',samay)
     try:
         print('Place Your finger...\n')
+        time.sleep(1)
         while (f.readImage() == False):
             pass
         f.convertImage()  
         result = f.searchTemplate()
-        if result[0]==-1:
+        if result[0] == -1:
             print('No Match Found Try Again...' + '\n')
-            attendance(time)
+            attendance(samay)
+            return None
         else:
             if not os.path.exists(f'data/{date}.csv'):
-                with open(f'data/{date}.csv', 'w'):
-                    pass
+                with open(f'data/{date}.csv', 'w') as file2:
+                    csvout = csv.writer(file2)
+                    csvout.writerow(['Roll','Name','Time In','Time Out'])
             print('Found template at position #' + str(result[0]+1) + '\n')
             with open('studentdata.csv','r') as file1:
-                with open(f'data/{date}.csv', 'r+') as file2:
-                    csvin = csv.reader(file1)
-                    csvout = csv.reader(file2)
-                    csvoutw = csv.writer(file2)
-                    for row in csvin:
+                with open(f'data/{date}.csv', 'r') as file2:
+                    csvread = csv.reader(file1)
+                    csvread2 = csv.reader(file2)
+                    csvwrite2 = csv.writer(file2)
+                    for row in csvread:
                         if row[0] == str(result[0]+1):
                             roll = str(row[1])
                             name = str(row[2])
                             print('Roll no: ',roll)
                             print('Name: ',name)
-                            print('Time: ',time)
-                            for row in csvout:
-                                if row[1] != name:
-                                    entry = [roll,name,time]
-                                    csvoutw.writerow(entry) 
+                            print('Time: ',samay)
+        with open(f'data/{date}.csv', 'r') as file:
+            reader = csv.reader(file)
+            rows = list(reader)
+            print(rows)
+        for i in rows:
+            if i[1] != name:
+                rows.append([roll,name,samay,'--'])
+            else:
+                i[3] = samay    
+        with open(f'data/{date}.csv', 'w') as file:
+            writer = csv.writer(file)
+            writer.writerows(rows)
+                                    
     except Exception as e:
         print('Operation Failed- Exception message: '+str(e) + '\n')       
 
