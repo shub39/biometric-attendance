@@ -10,11 +10,11 @@ Finally found a way to collect and store student data and show them while taking
 3. tty to USB converter
 
 # To Do
-1. fix the fingerprint scanner connection interface
+1. ~~fix the fingerprint scanner connection interface~~
 2. make passcode system to enroll new students
 3. integrate the 4x4 keypad
 4. integrate the lcd display
-5. figure out a way to store the attendance
+5. ~~figure out a way to store the attendance~~
 6. figure out a way to share the stored attendance with teachers
 7. design the box
 8. complete it
