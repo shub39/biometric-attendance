@@ -1,5 +1,6 @@
-# Attendance system with raspberry pi 4
-Finally found a way to collect and store student data and show them while taking attendance
+## Biometric Attendance system with raspberry pi 4
+A simple attendance system with raspberry pi 4 and fingerprint scanners. currently
+it can enroll new students, take attendance and store the data in a csv file.
 
 # Current Module Requirements
 <a href="https://pypi.org/project/pyfingerprint/">Pyfingerprint Module</a>
