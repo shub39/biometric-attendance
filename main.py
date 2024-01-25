@@ -116,12 +116,11 @@ def attendance(samay): #Take attendance
         with open(f'data/{date}.csv', 'r') as file:
             reader = csv.reader(file)
             rows = list(reader)
-            print(rows)
         for i in rows:
             if i[1] != name:
-                rows.append([roll,name,samay,'--'])
+                rows.append([roll,name,samay,"-"])
             else:
-                i[3] = samay    
+                i.append(samay)    
         with open(f'data/{date}.csv', 'w') as file:
             writer = csv.writer(file)
             writer.writerows(rows)
