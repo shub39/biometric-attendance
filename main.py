@@ -93,7 +93,6 @@ def attendance(samay): #Take attendance
         result = f.searchTemplate()
         if result[0] == -1:
             print('No Match Found Try Again...' + '\n')
-            attendance(samay)
             return None
         else:
             if not os.path.exists(f'data/{date}.csv'):
@@ -116,11 +115,14 @@ def attendance(samay): #Take attendance
         with open(f'data/{date}.csv', 'r') as file:
             reader = csv.reader(file)
             rows = list(reader)
+        present = 1    
         for i in rows:
-            if i[1] != name:
-                rows.append([roll,name,samay,"-"])
-            else:
-                i.append(samay)    
+            if i[1] == name:
+                i.append(samay)
+                present = 0
+                break
+        if present == 1:
+            rows.append([roll,name,samay])        
         with open(f'data/{date}.csv', 'w') as file:
             writer = csv.writer(file)
             writer.writerows(rows)
