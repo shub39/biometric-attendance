@@ -16,7 +16,7 @@ it can enroll new students, take attendance and store the data in a csv file.
 3. integrate the 4x4 keypad
 4. integrate the lcd display
 5. ~~figure out a way to store the attendance~~
-6. figure out a way to share the stored attendance with teachers
+6. ~~figure out a way to share the stored attendance with teachers~~
 7. design the box
 8. complete it
 9. integrate camera and face recgnition (maybe)
