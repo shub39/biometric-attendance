@@ -1,3 +1,5 @@
+#Importing Modules
+
 import os
 import time
 import csv
@@ -5,6 +7,7 @@ from pyfingerprint.pyfingerprint import PyFingerprint
 
 #################################################################################################################
 #################################################################################################################
+#Initialising the sensor
 
 try:
     f = PyFingerprint('/dev/ttyUSB0', 57600, 0xFFFFFFFF, 0x00000000)
@@ -13,13 +16,16 @@ except Exception as e:
 except Exception as e:
     print(str(e))
     
+#Make folder path    
 if not os.path.exists('data/'):
     os.makedirs('data/')
 
+#Get Time
 date = time.strftime("%d-%m-%Y", time.localtime())    
     
 #################################################################################################################
 #################################################################################################################
+#Funtions
 
 def show_data(): #Shows The number of fingerprints
     print('No of stored Fingerprints: ' + str(f.getTemplateCount()) + '\n')
@@ -132,6 +138,7 @@ def attendance(samay): #Take attendance
 
 ###################################################################################################################################################
 ###################################################################################################################################################
+#Main Python
 
 if __name__ == '__main__':
     t = 1
