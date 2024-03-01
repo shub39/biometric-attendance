@@ -1,4 +1,4 @@
-## Biometric Attendance system with raspberry pi 4
+# Biometric Attendance system with raspberry pi 4
 A simple attendance system with raspberry pi 4 and fingerprint scanners. currently
 it can enroll new students, take attendance and store the data in a csv file.
 
