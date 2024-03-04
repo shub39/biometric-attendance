@@ -64,15 +64,37 @@ if not os.path.exists('data/'):
 date = time.strftime("%d-%m-%Y", time.localtime())    
     
 # Funtions
-
+	
 def detect_keyboard(): #Detect keyBoard
 	devices = [evdev.InputDevice(fn) for fn in evdev.list_devices()]
 	for device in devices:
 		if "keyboard" in device.name.lower():
 			return True
 	return False
+	
+def subject_select(): # Select Subject
+	with canvas(device) as draw:
+		draw.text((0, 0), ":SELECT SUBJECT:", fill="white")
+		draw.text((0, 20), "1 - BSCH101 Chemistry", fill="white")
+		draw.text((0, 30), "2 - BSM201 Maths", fill="white")
+		draw.text((0, 40), "3 - ESCS201 Computer", fill="white")
+		draw.text((0, 50), "4 - HMHU201 English", fill="white")
+	subjects = ["BSCH101", "BSM201", "ESCS201", "HMHU201"]
+	while True:
+		if read_line(L1, ["1","2","3","A"]) == "1":
+			return subjects[0]
+			break
+		if read_line(L1, ["1","2","3","A"]) == "2":
+			return subjects[1]
+			break
+		if read_line(L1, ["1","2","3","A"]) == "3":
+			return subjects[2]
+			break
+		if read_line(L2, ["4","5","6","B"]) == "4":
+			return subjects[3]
+			break
 
-def read_line(line, characters):
+def read_line(line, characters): # Keypad stuff
 	GPIO.output(line, GPIO.HIGH)
 	if(GPIO.input(C1) == 1):
 		print(characters[0])
@@ -87,90 +109,6 @@ def read_line(line, characters):
 		print(characters[3])
 		return characters[3]
 	GPIO.output(line, GPIO.LOW)
-
-def show_data(): #Shows The number of fingerprints
-	print('No of stored Fingerprints: ' + str(f.getTemplateCount()) + '\n')
-	
-def clear_database(): #Clears the database 
-	f.clearDatabase()
-	with canvas(device) as draw: draw.text((0, 0), "DATA CLEARED", fill="white")
-	file1 = open('studentdata.csv','w')
-	file1.close()
-	print('All Data Cleared\n')
-	sleep(3)
-
-def enroll_fingerprint(): #Enrolls a new fingerprint
-	
-	if detect_keyboard() == False:
-		with canvas(device) as draw: draw.text((0, 0), "NO KEYBOARD", fill="white")
-		sleep(5)
-		return None
-			
-	print('Currently used templates: ' + str(f.getTemplateCount()) + '\n')
-	
-	try:
-			
-		print('*Waiting For Finger*' + '\n')
-		with canvas(device) as draw: draw.text((0, 0), "PLACE FINGER...", fill="white")
-		time.sleep(1)
-		
-		while (f.readImage() == False):
-			pass
-			
-		f.convertImage(0x01)
-		result = f.searchTemplate()
-		positionNumber = result[0]
-		
-		if (positionNumber >= 0):
-			print('Fingerprint Already Exists at #' + str(positionNumber+1) + '\n')
-			with canvas(device) as draw: draw.text((0, 0), "ALREADY EXISTS...", fill="white")
-			time.sleep(3)
-			return None
-			
-		else:
-			print('**Remove your finger**\n')
-			with canvas(device) as draw: draw.text((0, 0), "REMOVE FINGER", fill="white")
-			while (f.readImage() == True):
-				pass
-				
-			print('**Place your finger again**\n')
-			with canvas(device) as draw: draw.text((0, 0), "PLACE FINGER AGAIN", fill="white")    
-			time.sleep(1) 
-			
-			while (f.readImage() == False):
-				pass
-				
-			f.convertImage(0X02)  
-			
-			if f.compareCharacteristics() == 0:
-				print('Fingerprints dont match...Trying again\n')
-				with canvas(device) as draw:
-					draw.text((0, 0), "ERROR", fill="white")
-					draw.text((0, 10), "TRY AGAIN", fill="white")
-				time.sleep(2)
-				return None
-				
-			f.convertImage(0X02)
-			f.createTemplate()
-			positionNumber = f.storeTemplate()
-			
-			print('Fingerprint Registered In Position #' + str(positionNumber+1) + '\n')
-			
-			with open('studentdata.csv', 'a') as file:
-				writer = csv.writer(file)
-				with canvas(device) as draw: draw.text((0, 0), "ENTER ROLL", fill="white")
-				roll = str(input('Enter roll No: '))
-				with canvas(device) as draw: draw.text((0, 0), "ENTER NAME", fill="white")
-				name = str(input('Enter student Name: '))
-				with canvas(device) as draw: draw.text((0, 0), "ENTER DEPT", fill="white")
-				dept = str(input('Enter department: '))
-				with canvas(device) as draw: draw.text((0, 0), "ENTER YEAR", fill="white")
-				year = str(input('Enter Year: '))
-				writer.writerow([str(positionNumber+1),roll,name,dept,year])
-				
-	except Exception as e:
-		print('Operation failed- Exception message: ' + str(e) + '\n')
-		return None
 		
 def attendance(): #Takes attendance
 	time_tuple = time.localtime()
@@ -203,7 +141,7 @@ def attendance(): #Takes attendance
 			if not os.path.exists(f'data/{date}.csv'):
 				with open(f'data/{date}.csv', 'w') as file2:
 					csvout = csv.writer(file2)
-					csvout.writerow(['Roll','Name','Department','Year','Time In','Time Out'])
+					csvout.writerow(['Roll','Name','Subject','Time In','Time Out'])
 	
 			print('Found template at position #' + str(result[0]+1) + '\n')
 		
@@ -231,6 +169,8 @@ def attendance(): #Takes attendance
 				draw.text((0, 30), name, fill="white")
 			sleep(5)  
 		
+		subject = subject_select()
+		
 		with open(f'data/{date}.csv', 'r') as file:
 			reader = csv.reader(file)
 			rows = list(reader)
@@ -243,7 +183,7 @@ def attendance(): #Takes attendance
 				break
 		
 		if present == 1:
-			rows.append([roll,name,dept,year,samay])        
+			rows.append([roll,name,subject,samay])        
         
 		with open(f'data/{date}.csv', 'w') as file:
 			writer = csv.writer(file)
@@ -276,9 +216,5 @@ if __name__ == '__main__':
 		   
 		if read_line(L1, ["1","2","3","A"]) == "1" or read_line(L1, ["1","2","3","A"]) == "2" :  
 			attendance()
-		   
-		if read_line(L4, ["*","0","#","D"]) == "D" :  
-			clear_database()
-		   
-		if read_line(L4, ["*","0","#","D"]) == "#" :  
-			enroll_fingerprint()  
+			sleep(3)
+			   
