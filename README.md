@@ -1,4 +1,5 @@
 # Biometric Attendance system with raspberry pi 4
+
 A simple attendance system with raspberry pi 4 and fingerprint scanners. It has the following features
 
 1. Enroll Student data and store details like name, roll, subjects, etc
@@ -15,10 +16,12 @@ A simple attendance system with raspberry pi 4 and fingerprint scanners. It has 
 
 
 # Current Module Requirements
+
 <a href="https://pypi.org/project/pyfingerprint/">Pyfingerprint Module</a>
 <a href="https://pypi.org/project/luma.core/">Luma Core</a>
 
 # Current Devices Used
+
 1. Raspberry Pi 4 Model B
 2. R307 fingerprint scanner
 3. tty to USB converter
