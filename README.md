@@ -1,4 +1,6 @@
 # Biometric Attendance system with raspberry pi 4
+<img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/raspberrypi/raspberrypi-original.svg" height="100" width="100" align="right"/>
+<img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/python/python-original.svg" height="100" width="100" align="right"/>
 
 A simple attendance system with raspberry pi 4 and fingerprint scanners. It has the following features
 
@@ -17,14 +19,29 @@ A simple attendance system with raspberry pi 4 and fingerprint scanners. It has 
 
 # Current Module Requirements
 
-<a href="https://pypi.org/project/pyfingerprint/">Pyfingerprint Module</a>
-<a href="https://pypi.org/project/luma.core/">Luma Core</a>
+1. <a href="https://pypi.org/project/pyfingerprint/">Pyfingerprint Module</a>
+2. <a href="https://pypi.org/project/luma.core/">Luma Core</a>
 
 # Current Devices Used
 
-1. Raspberry Pi 4 Model B
-2. R307 fingerprint scanner
-3. tty to USB converter
-4. I2C OLED Display module
-5. USB C charging cable and power adapter
+<ol>
+    <li><a href="https://robu.in/product/raspberry-pi-4-model-b-with-1-gb-ram/">Raspberry Pi 4 Model B</a></li>
+    <li><a href="https://robu.in/product/r307-optical-fingerprint-reader-module-sensor/">R307 fingerprint scanner</a></li>
+    <li><a href="https://robu.in/product/pl2303-pl2303hx-usb-ttl-module-5-pin/">ttl to USB converter</a></li>
+    <li><a href="https://robu.in/product/0-96-inch-i2c-iic-oled-lcd-module-4pin-with-vcc-gnd-blue/">I2C OLED Display module</a></li>
+    <li>USB C charging cable and power adapter</li>
+    <li>Jumper wires</li>
+</ol>
+
+# Showcase
+<p align="left">
+  <a href="https://www.linkedin.com/posts/shub39_raspberrypi-datascience-attendancesystem-activity-7176772566303322112-Nl-x?utm_source=share&utm_medium=member_desktop"><img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white"/></a>
+</p>
+
+![image](https://github.com/shub39/fingerprint_attendance/assets/143277026/77be40a7-a433-4962-ad2a-fb686d6630e4)
+
+![image](https://github.com/shub39/fingerprint_attendance/assets/143277026/83a091b0-aa2a-4414-b10d-03398c2db51b)
+
+
+
 
