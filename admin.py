@@ -128,6 +128,78 @@ def clear_database(): #Clears the database
 	print('All Data Cleared\n')
 	sleep(3)
 
+def enroll_fingerprint(): #Enrolls a new fingerprint
+
+	print('COUNT: ' + str(f.getTemplateCount()) + '\n')
+	
+	try:
+			
+		print('PLACE FINGER...' + '\n')
+		with canvas(device) as draw: draw.text((0, 0), "PLACE FINGER...", fill="white")
+		time.sleep(1)
+		
+		while (f.readImage() == False):
+			pass
+			
+		f.convertImage(0x01)
+		result = f.searchTemplate()
+		positionNumber = result[0]
+		
+		if (positionNumber >= 0):
+			print('ALREADY EXISTS AT #' + str(positionNumber+1) + '\n')
+			with canvas(device) as draw: draw.text((0, 0), "ALREADY EXISTS...", fill="white")
+			time.sleep(3)
+			return None
+			
+		else:
+			print('REMOVE FINGER...\n')
+			with canvas(device) as draw: draw.text((0, 0), "REMOVE FINGER...", fill="white")
+			while (f.readImage() == True):
+				pass
+				
+			print('PLACE FINGER AGAIN...\n')
+			with canvas(device) as draw: draw.text((0, 0), "PLACE FINGER AGAIN...", fill="white")    
+			time.sleep(1) 
+			
+			while (f.readImage() == False):
+				pass
+				
+			f.convertImage(0X02)  
+			
+			if f.compareCharacteristics() == 0:
+				print('ERROR...TRY AGAIN\n')
+				with canvas(device) as draw:
+					draw.text((0, 0), "ERROR", fill="white")
+					draw.text((0, 10), "TRY AGAIN", fill="white")
+				time.sleep(2)
+				return None
+				
+			f.convertImage(0X02)
+			f.createTemplate()
+			positionNumber = f.storeTemplate()
+			
+			print('FINGERPRINT REGISTERED' + str(positionNumber+1) + '\n')
+			
+			with open('studentdata.csv', 'a') as file:
+				writer = csv.writer(file)
+				with canvas(device) as draw: draw.text((0, 0), "ENTER ROLL", fill="white")
+				print("ENTER ROLL: ")
+				roll = str(input())
+				with canvas(device) as draw: draw.text((0, 0), "ENTER NAME", fill="white")
+				print("ENTER NAME")
+				name = str(input())
+				with canvas(device) as draw: draw.text((0, 0), "ENTER DEPT", fill="white")
+				print("ENTER DEPT: ")
+				dept = str(input())
+				with canvas(device) as draw: draw.text((0, 0), "ENTER YEAR", fill="white")
+				print("ENTER YEAR: ")
+				year = str(input())
+				writer.writerow([str(positionNumber+1),roll,name,dept,year])
+				
+	except Exception as e:
+		print('Operation failed- Exception message: ' + str(e) + '\n')
+		return None
+		
 def attendance(): #Takes attendance
 	if subject == "": subject_select()
 	time_tuple = time.localtime()
@@ -215,17 +287,20 @@ def main_menu() :
 	while True:
 		with canvas(device) as draw:
 			draw.text((0, 0), "1 - ATTENDENCE", fill="white")
-			draw.text((0, 10), "2 - SELECT SUBJECT", fill="white")
-			draw.text((0, 20), "3 - SHOW DATA", fill="white")
-			draw.text((0, 30), "4 - SHUT DOWN", fill="white")
+			draw.text((0, 10), "2 - ENROLL", fill="white")
+			draw.text((0, 20), "3 - SELECT SUBJECT", fill="white")
+			draw.text((0, 30), "4 - SHOW DATA", fill="white")
+			draw.text((0, 40), "5 - SHUT DOWN", fill="white")
 			
 		if read_keypad() == "1": 
 			attendance()
 		if read_keypad() == "2": 
+			enroll_fingerprint()
+		if read_keypad() == "3": 
 			subject_select()
-		if read_keypad() == "3":
-			show_data()
 		if read_keypad() == "4":
+			show_data()
+		if read_keypad() == "5":
 			return 1
 
 # Main Funtion

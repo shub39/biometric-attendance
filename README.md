@@ -12,7 +12,7 @@ A simple attendance system with raspberry pi 4 and fingerprint scanners. It has 
 1. Use <a href="https://linuxhandbook.com/crontab/">Crontab</a> to run *"main.py"* at startup.
 2. Connect the peripherals properly (pinouts can be found easily on the web)
 3. Install the below mentioned modules
-4. To enroll students disable crontab, connect to the raspberry pi through <a href="https://www.realvnc.com/en/connect/download/viewer/">VNC Viewer </a> or HDMI and run *"main.py"*. You will require a keyboard to enroll student details.
+4. To enroll students disable crontab, connect to the raspberry pi through <a href="https://www.realvnc.com/en/connect/download/viewer/">VNC Viewer </a> or HDMI and run *"admin.py"*. You will require a keyboard to enroll student details.
 
 
 # Current Module Requirements
