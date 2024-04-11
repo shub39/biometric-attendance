@@ -9,18 +9,45 @@ A simple attendance system with raspberry pi 4 and fingerprint scanners. It has 
 3. Share the data over network with teachers <a href="https://syncthing.net/">Using Syncthing</a>
 
 
-# Note
+# QuickStart
 
-1. Use <a href="https://linuxhandbook.com/crontab/">Crontab</a> to run *"main.py"* at startup.
-2. Connect the peripherals properly (pinouts can be found easily on the web)
-3. Install the below mentioned modules
-4. To enroll students disable crontab, connect to the raspberry pi through <a href="https://www.realvnc.com/en/connect/download/viewer/">VNC Viewer </a> or HDMI and run *"admin.py"*. You will require a keyboard to enroll student details.
+1. Download copy of the code or clone it to desired path in the raspberry pi
+2. Use <a href="https://linuxhandbook.com/crontab/">Crontab</a> to run *"main.py"* at startup.
+3. Connect the peripherals properly (pinouts can be found easily on the web)
+4. Install the below mentioned modules
+5. To enroll students disable crontab, connect to the raspberry pi through <a href="https://www.realvnc.com/en/connect/download/viewer/">VNC Viewer </a> or HDMI and run *"admin.py"*. You will require a keyboard to enroll student details.
 
 
 # Current Module Requirements
-
+These two modules need to be installed via pip. I recommend installing them directly using `--break-system-packages` as setting up a virtual environment leads to problems while trying to autorun the program
 1. <a href="https://pypi.org/project/pyfingerprint/">Pyfingerprint Module</a>
+```bash
+pip install pyfingerprint --break-system-packages
+```
 2. <a href="https://pypi.org/project/luma.core/">Luma Core</a>
+```bash
+pip install luma.core --break-system-packages
+```
+# How To Autorun?
+As mentioned above I am using <a href="https://linuxhandbook.com/crontab/">Crontab</a> to autorun the *main.py* at startup. I am using a bash script because it just works. Make a new file in the home directory named `start.sh` and enter the following.
+```bash
+#!/bin/bash
+cd PATH/TO/FOLDER # path to the directory where main.py is located
+python3 main.py 
+```
+grant executable permission to the script
+```bash
+chmod +x start.sh
+```
+Open terminal and enter
+```bash
+crontab -e
+```
+select your preffered text editor and go to the last line and add
+```bash
+@reboot ~/start.sh
+```
+save and exit. Now the program should run automatically from the next boot
 
 # Current Devices Used
 
