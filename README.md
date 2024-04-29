@@ -61,9 +61,6 @@ save and exit. Now the program should run automatically from the next boot
 </ol>
 
 # Showcase
-<p align="left">
-  <a href="https://www.linkedin.com/posts/shub39_raspberrypi-datascience-attendancesystem-activity-7176772566303322112-Nl-x?utm_source=share&utm_medium=member_desktop"><img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white"/></a>
-</p>
 
 ![image](https://github.com/shub39/fingerprint_attendance/assets/143277026/77be40a7-a433-4962-ad2a-fb686d6630e4)
 
