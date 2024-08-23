@@ -3,52 +3,19 @@
 import os
 import time
 import csv
-import RPi.GPIO as GPIO
+from keypad import read_keypad
+import display
 import evdev
 import sys
 
 from time import sleep
 from pyfingerprint.pyfingerprint import PyFingerprint
-from luma.core.interface.serial import i2c
-from luma.core.render import canvas
-from luma.oled.device import ssd1306, ssd1325, ssd1331, sh1106
 
 # Subject
 
 subject = ""
 
-# OLED display stuff
-
-serial = i2c(port=1, address=0x3C)
-device = ssd1306(serial, rotate=0)
-
-# Keyboard stuff
-
-L1 = 5
-L2 = 6
-L3 = 13
-L4 = 19
-
-C1 = 12
-C2 = 16
-C3 = 20
-C4 = 21
-
-GPIO.setwarnings(False)
-GPIO.setmode(GPIO.BCM)
-
-GPIO.setup(L1, GPIO.OUT)
-GPIO.setup(L2, GPIO.OUT)
-GPIO.setup(L3, GPIO.OUT)
-GPIO.setup(L4, GPIO.OUT)
-
-GPIO.setup(C1, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-GPIO.setup(C2, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-GPIO.setup(C3, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-GPIO.setup(C4, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-
 # Initialising the fingerprint sensor
-
 try:
     f = PyFingerprint('/dev/ttyUSB0', 57600, 0xFFFFFFFF, 0x00000000)
 except Exception as e:
@@ -67,15 +34,18 @@ date = time.strftime("%d-%m-%Y", time.localtime())
     
 # Funtions
 
-def subject_select(): # Select Subject
+# Select Subject
+def subject_select(): 
 	global subject
-	with canvas(device) as draw:
-		draw.text((0, 0), ":SELECT SUBJECT:", fill="white")
-		draw.text((0, 20), "1 - BSCH101 CHEM", fill="white")
-		draw.text((0, 30), "2 - BSM201 MATH", fill="white")
-		draw.text((0, 40), "3 - ESCS201 COMP", fill="white")
-		draw.text((0, 50), "4 - HMHU201 ENG", fill="white")
+	display.draw([
+	"SELECT SUBJECT",
+	"1 - BSCH101 CHEM",
+	"2 - BSM201 MATH",
+	"3 - ESCS201 COMP",
+	"4 - HMHU201 ENG"
+	])
 	sleep(0.2)
+
 	while True:
 		if read_keypad() == "1":
 			subject = "BSCH101"
@@ -89,46 +59,31 @@ def subject_select(): # Select Subject
 		if read_keypad() == "4":
 			subject = "HMHU201"
 			break
-	with canvas(device) as draw: draw.text((0, 0), "SELECTED " + subject, fill="white")
+	display.draw(["SELECTED", subject])
 	print("SELECTED " + subject)
 	sleep(1)
 
-def read_keypad():
-    keys = [
-        ["1", "2", "3", "A"],
-        ["4", "5", "6", "B"],
-        ["7", "8", "9", "C"],
-        ["*", "0", "#", "D"]
-    ]
-    lines = [L1, L2, L3, L4]
-    columns = [C1, C2, C3, C4]
-    output = ""
-    for i, line in enumerate(lines):
-        GPIO.output(line, GPIO.HIGH)
-        for j, column in enumerate(columns):
-            if GPIO.input(column) == 1:
-                output = keys[i][j]
-                print(output)
-        GPIO.output(line, GPIO.LOW)
-    return output 
-
-def show_data(): #Shows The number of fingerprints
+#Shows The number of fingerprints
+def show_data(): 
 	print('COUNT: ' + str(f.getTemplateCount()) + '\n')
 	print("SUBJECT: " + subject)
-	with canvas(device) as draw: 
-		draw.text((0, 0), "COUNT: " + str(f.getTemplateCount()), fill="white")
-		draw.text((0, 10), "SUBJECT: " + subject, fill="white")
+	display.draw([
+	"COUNT: " + str(f.getTemplateCount()),
+	"SUBJECT: " + subject
+	])
 	sleep(2)
 	
-def clear_database(): #Clears the database 
+#Clears the database 
+def clear_database(): 
 	f.clearDatabase()
-	with canvas(device) as draw: draw.text((0, 0), "DATA CLEARED", fill="white")
+	display.draw(["DATA CLEARED"])
 	file1 = open('studentdata.csv','w')
 	file1.close()
 	print('All Data Cleared\n')
 	sleep(3)
-
-def attendance(): #Takes attendance
+		
+#Takes attendance
+def attendance(): 
 	if subject == "": subject_select()
 	time_tuple = time.localtime()
 	samay = time.strftime('%H:%M', time_tuple)
@@ -139,10 +94,12 @@ def attendance(): #Takes attendance
 		time.sleep(1)
 	
 		while (f.readImage() == False):
-			with canvas(device) as draw:
-				draw.text((0, 0), "PLACE FINGER...", fill="white")
-				draw.text((0, 10), subject + " " + samay, fill="white")
-				sleep(0.1)
+			display.draw([
+			"PLACE FINGER",
+			"SUBJECT: " + subject,
+			"TIME:" + samay,
+			"DATE: " + date
+			])
 			pass
 		
 		f.convertImage()  
@@ -150,9 +107,10 @@ def attendance(): #Takes attendance
 		
 		if result[0] == -1:
 			print('NO MATCH TRY AGAIN...' + '\n')
-			with canvas(device) as draw:
-				draw.text((0, 0), "NO MATCH", fill="white")
-				draw.text((0, 10), "TRY AGAIN...", fill="white")
+			display.draw([
+			"NO MATCH",
+			"TRY AGAIN..."
+			])
 			sleep(3)
 			return None
 		
@@ -181,13 +139,14 @@ def attendance(): #Takes attendance
 							print('Department: ',dept)
 							print('Year: ',year)
 							print('Time: ',samay)
-							
-			with canvas(device) as draw:
-				draw.text((0, 0), "REGISTERING...", fill="white")
-				draw.text((0, 20), name, fill="white")
-				draw.text((0, 30), roll, fill="white")
-				draw.text((0, 40), dept, fill="white")
-				draw.text((0, 50), year, fill="white")
+					
+			display.draw([
+			"REGISTERING...",
+			"NAME: " + name,
+			"ROLL: " + roll,
+			"DEPT: " + dept,
+			"YEAR: " + year
+			])		
 			sleep(3)  
 			
 		with open(f'data/{date}_{subject}.csv', 'r') as file:
@@ -211,26 +170,28 @@ def attendance(): #Takes attendance
 	except Exception as e:
 		print('Operation Failed- Exception message: '+str(e) + '\n')       
 
+#Main Menu
 def main_menu() :
 	while True:
-		with canvas(device) as draw:
-			draw.text((0, 0), "1 - ATTENDENCE", fill="white")
-			draw.text((0, 10), "2 - SELECT SUBJECT", fill="white")
-			draw.text((0, 20), "3 - SHOW DATA", fill="white")
-			draw.text((0, 30), "4 - SHUT DOWN", fill="white")
+		display.draw([
+		"1 - ATTENDANCE",
+		"2 - SELECT SUBJECT",
+		"3 - SHOW DATA",
+		"4 - SHUT DOWN"
+		])
 			
 		if read_keypad() == "1": 
 			attendance()
 		if read_keypad() == "2": 
 			subject_select()
-		if read_keypad() == "3":
+		if read_keypad() == "3": 
 			show_data()
 		if read_keypad() == "4":
 			return 1
 
 # Main Funtion
-
 if __name__ == '__main__':
 	if main_menu() == 1:
 		os.system("sudo shutdown now")
 		sys.exit()
+
